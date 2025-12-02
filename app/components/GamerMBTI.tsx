@@ -40,6 +40,7 @@ import {
 import { useI18n, interpolate } from "@/lib/i18n";
 import MBTIShareCard, { MBTI_CONFIG } from "./MBTIShareCard";
 import { toPng } from "html-to-image";
+import { useGamesStore } from "@/lib/stores/useGamesStore";
 
 interface SignatureGame {
   name: string;
@@ -98,6 +99,9 @@ export default function GamerMBTI({ games, genreData }: GamerMBTIProps) {
   const [showShareModal, setShowShareModal] = useState(false);
   const [generating, setGenerating] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
+
+  // Get reviews from Zustand store (already fetched globally)
+  const storeReviews = useGamesStore((s) => s.reviews);
 
   // @ts-expect-error - steamId is custom
   const steamId = session?.user?.steamId as string | undefined;
@@ -213,16 +217,10 @@ export default function GamerMBTI({ games, genreData }: GamerMBTIProps) {
     }
 
     try {
-      // Fetch user reviews to include in analysis
-      let reviews = null;
-      try {
-        const reviewsRes = await fetch("/api/steam/reviews");
-        if (reviewsRes.ok) {
-          reviews = await reviewsRes.json();
-        }
-      } catch (e) {
-        console.log("Could not fetch reviews:", e);
-      }
+      // Use reviews from Zustand store (already fetched globally)
+      const reviews = storeReviews.length > 0 
+        ? { reviews: storeReviews, totalReviews: storeReviews.length }
+        : null;
 
       const res = await fetch("/api/analyze-personality", {
         method: "POST",
