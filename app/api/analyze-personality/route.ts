@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { NextRequest, NextResponse } from "next/server";
+import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -24,8 +24,12 @@ export async function POST(request: NextRequest) {
   try {
     const stats: GameStats = await request.json();
 
-    const topGamesList = stats.topGames.map((g, i) => `${i + 1}. 《${g.name}》: ${g.hours}小时`).join('\n');
-    const topGenresList = stats.topGenres.map((g, i) => `${i + 1}. ${g.name}: ${g.hours}小时, ${g.count}款游戏`).join('\n');
+    const topGamesList = stats.topGames
+      .map((g, i) => `${i + 1}. 《${g.name}》: ${g.hours}小时`)
+      .join("\n");
+    const topGenresList = stats.topGenres
+      .map((g, i) => `${i + 1}. ${g.name}: ${g.hours}小时, ${g.count}款游戏`)
+      .join("\n");
 
     const prompt = `你是一位资深的心理学家和游戏行为分析师，精通MBTI人格理论。请根据以下Steam游戏库数据，深度分析这位玩家的MBTI人格类型。
 
@@ -33,9 +37,14 @@ export async function POST(request: NextRequest) {
 
 ### 基础统计
 - 游戏库总数：${stats.totalGames} 款游戏
-- 已游玩游戏：${stats.playedGames} 款 (${((stats.playedGames / stats.totalGames) * 100).toFixed(1)}%)
+- 已游玩游戏：${stats.playedGames} 款 (${(
+      (stats.playedGames / stats.totalGames) *
+      100
+    ).toFixed(1)}%)
 - 未游玩游戏：${stats.unplayedGames} 款
-- 总游戏时长：${stats.totalPlaytimeHours.toLocaleString()} 小时（约 ${Math.round(stats.totalPlaytimeHours / 24)} 天）
+- 总游戏时长：${stats.totalPlaytimeHours.toLocaleString()} 小时（约 ${Math.round(
+      stats.totalPlaytimeHours / 24
+    )} 天）
 - 平均每款游戏时长：${stats.averagePlaytimeHours.toFixed(1)} 小时
 - 最近两周活跃游戏：${stats.recentlyPlayed} 款
 - 超过一年未玩的游戏：${stats.oldestUnplayed} 款
@@ -56,6 +65,11 @@ ${topGamesList}
 4. **J/P (判断/感知)**：考虑游戏完成度、是否专注少数游戏深度游玩还是广泛尝试各种游戏
 
 **重要**：在分析中，请务必引用玩家实际游玩的具体游戏名称作为证据支撑你的分析。
+
+**代表游戏选择要求**：
+- 必须从玩家游戏库中选择，且必须来自**不同的游戏类型/类别**
+- 例如：不能同时选择两款CRPG（如博德之门3和神界原罪2），应该选择不同类型的游戏
+- 每款代表游戏都要标注其主要类型（如RPG、策略、动作、模拟、竞技等）
 
 请用以下JSON格式回复（只回复JSON，不要其他内容）：
 
@@ -91,9 +105,10 @@ ${topGamesList}
     "strengths": ["优势1：具体描述", "优势2：具体描述", "优势3：具体描述"],
     "weaknesses": ["弱点1：具体描述", "弱点2：具体描述"],
     "signatureGames": [
-      { "name": "玩家库中最能代表其人格的游戏1", "reason": "为什么这款游戏代表了该人格" },
-      { "name": "玩家库中最能代表其人格的游戏2", "reason": "为什么这款游戏代表了该人格" },
-      { "name": "玩家库中最能代表其人格的游戏3", "reason": "为什么这款游戏代表了该人格" }
+      { "name": "游戏名称", "genre": "游戏类型", "category": "主力游戏", "reason": "为什么选择这款游戏" },
+      { "name": "游戏名称", "genre": "游戏类型", "category": "近期热衷", "reason": "为什么选择这款游戏" },
+      { "name": "游戏名称", "genre": "游戏类型", "category": "隐藏宝藏", "reason": "为什么选择这款游戏" },
+      { "name": "游戏名称", "genre": "游戏类型", "category": "跨界之选", "reason": "与主要偏好不同类型的游戏，体现多样性" }
     ],
     "recommendedGenres": ["推荐尝试的游戏类型1", "推荐尝试的游戏类型2", "推荐尝试的游戏类型3"],
     "gamingStyle": {
@@ -106,36 +121,40 @@ ${topGamesList}
 }`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: "gpt-4o",
       messages: [
         {
-          role: 'system',
-          content: '你是一位专业的MBTI分析师和游戏心理学专家，擅长通过游戏行为分析人格类型。你的分析必须有深度、有洞察力，并且大量引用用户实际游玩的游戏作为证据。请严格按照要求的JSON格式回复。'
+          role: "system",
+          content:
+            "你是一位专业的MBTI分析师和游戏心理学专家，擅长通过游戏行为分析人格类型。你的分析必须有深度、有洞察力，并且大量引用用户实际游玩的游戏作为证据。选择代表游戏时，必须确保多样性——从不同类型的游戏中各选一款，避免选择类型相似的游戏。请严格按照要求的JSON格式回复。",
         },
         {
-          role: 'user',
-          content: prompt
-        }
+          role: "user",
+          content: prompt,
+        },
       ],
       temperature: 0.7,
-      max_tokens: 2500,
+      max_tokens: 3000,
     });
 
-    const responseText = completion.choices[0]?.message?.content || '';
-    
+    const responseText = completion.choices[0]?.message?.content || "";
+
     // Parse JSON from response
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      throw new Error('Failed to parse LLM response');
+      throw new Error("Failed to parse LLM response");
     }
-    
+
     const result = JSON.parse(jsonMatch[0]);
-    
+
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error analyzing personality:', error);
+    console.error("Error analyzing personality:", error);
     return NextResponse.json(
-      { error: 'Failed to analyze personality', details: (error as Error).message },
+      {
+        error: "Failed to analyze personality",
+        details: (error as Error).message,
+      },
       { status: 500 }
     );
   }

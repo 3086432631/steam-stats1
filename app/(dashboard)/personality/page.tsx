@@ -5,6 +5,7 @@ import { useGames } from "@/app/components/GamesProvider";
 import GamerMBTI from "@/app/components/GamerMBTI";
 import { Loader2 } from "lucide-react";
 import { getCachedGameDetails, setCachedGameDetails } from "@/lib/cache";
+import { useI18n } from "@/lib/i18n";
 
 interface GenreData {
   name: string;
@@ -14,6 +15,7 @@ interface GenreData {
 
 export default function PersonalityPage() {
   const { games, loading: gamesLoading } = useGames();
+  const { t } = useI18n();
   const [genreData, setGenreData] = useState<GenreData[]>([]);
   const [loadingGenres, setLoadingGenres] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -96,16 +98,16 @@ export default function PersonalityPage() {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold">游戏人格分析</h1>
+          <h1 className="text-2xl font-bold">{t.personality.title}</h1>
           <p className="text-muted-foreground mt-1">
-            基于 MBTI 模型的游戏人格测试
+            {t.personality.subtitle}
           </p>
         </div>
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              {gamesLoading ? "加载游戏数据..." : "分析游戏类型..."}
+              {t.common.loading}
             </p>
             {!gamesLoading && (
               <p className="text-xs text-muted-foreground mt-1">{progress}%</p>
@@ -127,9 +129,9 @@ export default function PersonalityPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">游戏人格分析</h1>
+        <h1 className="text-2xl font-bold">{t.personality.title}</h1>
         <p className="text-muted-foreground mt-1">
-          基于 MBTI 模型的游戏人格测试
+          {t.personality.subtitle}
         </p>
       </div>
 
