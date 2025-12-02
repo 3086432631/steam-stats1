@@ -390,13 +390,13 @@ export default function ValueAnalysis({ games }: ValueAnalysisProps) {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{game.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {getCurrencySymbol(currency)}
+                      {getCurrencySymbol(game.currency || currency)}
                       {game.price?.toFixed(2)} •{" "}
                       {Math.round(game.playtime_forever / 60)}h
                     </p>
                   </div>
                   <Badge className={getValueColor(game.costPerHour || 0)}>
-                    {getCurrencySymbol(currency)}
+                    {getCurrencySymbol(game.currency || currency)}
                     {game.costPerHour?.toFixed(2)}/h
                   </Badge>
                 </div>
@@ -436,13 +436,13 @@ export default function ValueAnalysis({ games }: ValueAnalysisProps) {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{game.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {getCurrencySymbol(currency)}
+                      {getCurrencySymbol(game.currency || currency)}
                       {game.price?.toFixed(2)} •{" "}
                       {Math.round(game.playtime_forever / 60)}h
                     </p>
                   </div>
                   <Badge variant="destructive">
-                    {getCurrencySymbol(currency)}
+                    {getCurrencySymbol(game.currency || currency)}
                     {game.costPerHour?.toFixed(2)}/h
                   </Badge>
                 </div>

@@ -66,8 +66,9 @@ export async function GET(
   }
 
   try {
+    // Use cc=us to get consistent USD prices regardless of server region
     const response = await fetchWithRateLimit(
-      `https://store.steampowered.com/api/appdetails?appids=${appid}&l=english`,
+      `https://store.steampowered.com/api/appdetails?appids=${appid}&l=english&cc=us`,
       appid
     );
 
