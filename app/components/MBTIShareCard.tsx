@@ -200,14 +200,7 @@ export const MBTI_CONFIG: Record<
 
 const MBTIShareCard = forwardRef<HTMLDivElement, MBTIShareCardProps>(
   (
-    {
-      result,
-      totalGames,
-      totalHours,
-      userName,
-      userAvatar,
-      gameIcons,
-    },
+    { result, totalGames, totalHours, userName, userAvatar, gameIcons },
     ref
   ) => {
     const config = MBTI_CONFIG[result.mbtiType] || MBTI_CONFIG.INTJ;
@@ -344,9 +337,7 @@ const MBTIShareCard = forwardRef<HTMLDivElement, MBTIShareCardProps>(
                   {config.group}
                 </span>
               </div>
-              <p className="text-white text-xl font-bold mb-1">
-                {config.name}
-              </p>
+              <p className="text-white text-xl font-bold mb-1">{config.name}</p>
               <p className="text-white/80 text-sm">
                 {result.shareCard?.tagline || result.personality.title}
               </p>
@@ -392,9 +383,7 @@ const MBTIShareCard = forwardRef<HTMLDivElement, MBTIShareCardProps>(
                       width: `${barWidth}%`,
                     }}
                   />
-                  <div
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-3 bg-gray-200"
-                  />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-3 bg-gray-200" />
                 </div>
                 <span
                   className={`w-5 text-xs font-bold ${
@@ -425,10 +414,7 @@ const MBTIShareCard = forwardRef<HTMLDivElement, MBTIShareCardProps>(
               {result.personality.signatureGames.slice(0, 4).map((game, i) => {
                 const iconInfo = gameIcons?.[game.name];
                 return (
-                  <div
-                    key={i}
-                    className="flex-1 flex flex-col items-center"
-                  >
+                  <div key={i} className="flex-1 flex flex-col items-center">
                     {gameIconDataUrls[game.name] ? (
                       <img
                         src={gameIconDataUrls[game.name]}
@@ -460,24 +446,25 @@ const MBTIShareCard = forwardRef<HTMLDivElement, MBTIShareCardProps>(
         )}
 
         {/* Highlights as tags */}
-        {result.shareCard?.highlights && result.shareCard.highlights.length > 0 && (
-          <div className="px-6 pb-4 bg-white">
-            <div className="flex flex-wrap gap-1.5 justify-center">
-              {result.shareCard.highlights.map((highlight, i) => (
-                <span
-                  key={i}
-                  className="text-[11px] px-3 py-1 rounded-full font-medium"
-                  style={{
-                    backgroundColor: config.bgColor,
-                    color: config.color,
-                  }}
-                >
-                  {highlight}
-                </span>
-              ))}
+        {result.shareCard?.highlights &&
+          result.shareCard.highlights.length > 0 && (
+            <div className="px-6 pb-4 bg-white">
+              <div className="flex flex-wrap gap-1.5 justify-center">
+                {result.shareCard.highlights.map((highlight, i) => (
+                  <span
+                    key={i}
+                    className="text-[11px] px-3 py-1 rounded-full font-medium"
+                    style={{
+                      backgroundColor: config.bgColor,
+                      color: config.color,
+                    }}
+                  >
+                    {highlight}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Footer */}
         <div
@@ -485,15 +472,19 @@ const MBTIShareCard = forwardRef<HTMLDivElement, MBTIShareCardProps>(
           style={{ backgroundColor: config.color }}
         >
           <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-white/80" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            <svg
+              className="w-4 h-4 text-white/80"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
             </svg>
             <span className="text-white/80 text-xs font-medium">
               Steam 游戏人格分析
             </span>
           </div>
           <span className="text-white/60 text-[10px]">
-            steamstats.app
+            https://steam-stats-brown.vercel.app
           </span>
         </div>
       </div>

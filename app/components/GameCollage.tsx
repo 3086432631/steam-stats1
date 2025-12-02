@@ -87,14 +87,19 @@ function spiralPlacement(
           const y = centerY + Math.sin(angle) * radius - box.h / 2;
 
           // Check bounds
-          if (x < 0 || y < 0 || x + box.w > canvasWidth || y + box.h > canvasHeight) {
+          if (
+            x < 0 ||
+            y < 0 ||
+            x + box.w > canvasWidth ||
+            y + box.h > canvasHeight
+          ) {
             continue;
           }
 
           if (!hasOverlap({ x, y, w: box.w, h: box.h }, placed)) {
             const dist = Math.sqrt(
               Math.pow(x + box.w / 2 - centerX, 2) +
-              Math.pow(y + box.h / 2 - centerY, 2)
+                Math.pow(y + box.h / 2 - centerY, 2)
             );
             if (dist < bestDist) {
               bestDist = dist;
@@ -123,26 +128,40 @@ function spiralPlacement(
 }
 
 // Calculate bounding box of all placed items
-function getBoundingBox(boxes: GameBox[]): { minX: number; minY: number; maxX: number; maxY: number } {
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  
+function getBoundingBox(boxes: GameBox[]): {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+} {
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
+
   for (const box of boxes) {
     minX = Math.min(minX, box.x);
     minY = Math.min(minY, box.y);
     maxX = Math.max(maxX, box.x + box.w);
     maxY = Math.max(maxY, box.y + box.h);
   }
-  
+
   return { minX, minY, maxX, maxY };
 }
 
-export default function GameCollage({ games, maxGames = 150 }: GameCollageProps) {
+export default function GameCollage({
+  games,
+  maxGames = 150,
+}: GameCollageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [generated, setGenerated] = useState(false);
-  const [canvasStyle, setCanvasStyle] = useState<{ width: string; height: string }>({ width: "100%", height: "auto" });
+  const [canvasStyle, setCanvasStyle] = useState<{
+    width: string;
+    height: string;
+  }>({ width: "100%", height: "auto" });
 
   const generateCollage = useCallback(async () => {
     if (loading) return;
@@ -167,7 +186,7 @@ export default function GameCollage({ games, maxGames = 150 }: GameCollageProps)
     }
 
     const maxPlaytime = playedGames[0].playtime_forever;
-    
+
     // Size parameters (in logical pixels, will be scaled up for high DPI)
     const minHeight = 50;
     const maxHeight = 250;
@@ -183,7 +202,7 @@ export default function GameCollage({ games, maxGames = 150 }: GameCollageProps)
 
     // Initial canvas size for placement calculation
     const workingSize = 4000;
-    
+
     // Place boxes using spiral algorithm (highest playtime = center)
     const placed = spiralPlacement(boxes, workingSize, workingSize);
 
@@ -195,7 +214,7 @@ export default function GameCollage({ games, maxGames = 150 }: GameCollageProps)
     // Calculate actual bounding box and normalize positions
     const bounds = getBoundingBox(placed);
     const padding = 40;
-    
+
     const logicalWidth = bounds.maxX - bounds.minX + padding * 2;
     const logicalHeight = bounds.maxY - bounds.minY + padding * 2;
 
@@ -208,7 +227,7 @@ export default function GameCollage({ games, maxGames = 150 }: GameCollageProps)
     // Set canvas size with scale factor for high DPI
     canvas.width = logicalWidth * SCALE_FACTOR;
     canvas.height = logicalHeight * SCALE_FACTOR;
-    
+
     // Scale context for high DPI rendering
     ctx.scale(SCALE_FACTOR, SCALE_FACTOR);
 
@@ -222,7 +241,7 @@ export default function GameCollage({ games, maxGames = 150 }: GameCollageProps)
 
     // Load all images first
     const imageMap = new Map<number, HTMLImageElement>();
-    
+
     for (const box of placed) {
       const imageUrl = `/api/image-proxy?url=${encodeURIComponent(
         `https://cdn.cloudflare.steamstatic.com/steam/apps/${box.game.appid}/header.jpg`
@@ -296,14 +315,18 @@ export default function GameCollage({ games, maxGames = 150 }: GameCollageProps)
     ctx.font = "bold 18px system-ui, sans-serif";
     ctx.textAlign = "right";
     ctx.textBaseline = "bottom";
-    ctx.fillText("steamstats.app", logicalWidth - padding, logicalHeight - padding / 2);
+    ctx.fillText(
+      "https://steam-stats-brown.vercel.app",
+      logicalWidth - padding,
+      logicalHeight - padding / 2
+    );
 
     // Calculate display size to fit container
     const containerWidth = containerRef.current?.clientWidth || 800;
     const aspectRatio = logicalWidth / logicalHeight;
     const displayWidth = containerWidth;
     const displayHeight = displayWidth / aspectRatio;
-    
+
     setCanvasStyle({
       width: `${displayWidth}px`,
       height: `${displayHeight}px`,
@@ -334,13 +357,13 @@ export default function GameCollage({ games, maxGames = 150 }: GameCollageProps)
 
   return (
     <div className="space-y-4">
-      <div 
+      <div
         ref={containerRef}
         className="relative rounded-lg overflow-hidden bg-[#0a0a0f] border border-border"
       >
         <canvas
           ref={canvasRef}
-          style={{ 
+          style={{
             display: generated ? "block" : "none",
             ...canvasStyle,
           }}
@@ -366,12 +389,20 @@ export default function GameCollage({ games, maxGames = 150 }: GameCollageProps)
             <Download className="h-4 w-4 mr-2" />
             下载高清图片
           </Button>
-          <Button variant="ghost" size="sm" onClick={generateCollage} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={generateCollage}
+            disabled={loading}
+          >
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+            />
             重新生成
           </Button>
           <span className="text-xs text-muted-foreground">
-            {Math.min(maxGames, playedGamesCount)} 款游戏 · 中心为游戏时长最长的游戏
+            {Math.min(maxGames, playedGamesCount)} 款游戏 ·
+            中心为游戏时长最长的游戏
           </span>
         </div>
       )}
