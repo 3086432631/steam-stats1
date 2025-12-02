@@ -22,6 +22,7 @@ interface GameDetails {
   appid: number;
   genres: string[];
   price: number | null;
+  currency?: string;
   developers: string[];
   metacritic: { score: number } | null;
   timestamp: number;
@@ -246,13 +247,15 @@ export async function setCachedGameDetails(
   genres: string[],
   price: number | null,
   developers: string[],
-  metacritic: { score: number } | null
+  metacritic: { score: number } | null,
+  currency?: string
 ): Promise<void> {
   try {
     await db.gameDetails.put({
       appid,
       genres,
       price,
+      currency,
       developers,
       metacritic,
       timestamp: Date.now(),

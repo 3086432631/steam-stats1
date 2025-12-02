@@ -111,6 +111,11 @@ export default function ValueAnalysis({ games }: ValueAnalysisProps) {
 
         if (cached && cached.price !== undefined && cached.price !== null) {
           price = cached.price;
+          // Read currency from cache if available
+          if (cached.currency) {
+            currency = cached.currency;
+            detectedCurrency = currency;
+          }
         } else {
           try {
             const res = await fetch(`/api/steam/app/${game.appid}`);
@@ -126,7 +131,7 @@ export default function ValueAnalysis({ games }: ValueAnalysisProps) {
                 price = 0;
               }
 
-              // Save to IDB cache
+              // Save to IDB cache (including currency)
               await setCachedGameDetails(
                 game.appid,
                 data.genres?.map(
@@ -134,7 +139,8 @@ export default function ValueAnalysis({ games }: ValueAnalysisProps) {
                 ) || [],
                 price,
                 data.developers || [],
-                data.metacritic || null
+                data.metacritic || null,
+                currency
               );
             }
             // Small delay to avoid rate limiting (only for API calls)
