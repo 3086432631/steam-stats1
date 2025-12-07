@@ -1,0 +1,14 @@
+{
+  "env": {
+    "STEAM_API_KEY": "@steam-api-key",
+    "NEXTAUTH_SECRET": "@nextauth-secret",
+    "NEXTAUTH_URL": "@nextauth-url",
+    "OPENAI_API_KEY": "@openai-api-key",
+    "GOOGLE_GEMINI_API_KEY": "@google-gemini-api-key"
+  },
+  "build": {
+    "env": {
+      "NODE_OPTIONS": "--max_old_space_size=4096"
+    }
+  }
+}
