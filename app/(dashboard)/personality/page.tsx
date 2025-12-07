@@ -17,7 +17,7 @@ export default function PersonalityPage() {
   const [genreData, setGenreData] = useState<GenreData[]>([]);
   const [loadingGenres, setLoadingGenres] = useState(true);
   const [progress, setProgress] = useState(0);
-
+}
   // 构建符合 GameStats 接口的数据
   const stats = useMemo((): GameStats => {
     // 1. 处理空数据情况
