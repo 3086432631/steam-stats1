@@ -7,7 +7,6 @@ import { Loader2 } from "lucide-react";
 import { getCachedGameDetails, setCachedGameDetails } from "@/lib/cache";
 import { useI18n } from "@/lib/i18n";
 import { AIAnalysisGemini } from "@/components/ai-analysis-gemini";
-// 引入正确的类型定义
 import { GameStats, GenreData } from "@/components/ai-analysis-types";
 
 export default function PersonalityPage() {
@@ -17,8 +16,8 @@ export default function PersonalityPage() {
   const [genreData, setGenreData] = useState<GenreData[]>([]);
   const [loadingGenres, setLoadingGenres] = useState(true);
   const [progress, setProgress] = useState(0);
-}
-  // 构建符合 GameStats 接口的数据
+
+  // 构建 stats 数据
   const stats = useMemo((): GameStats => {
     // 1. 处理空数据情况
     if (games.length === 0) {
@@ -63,8 +62,8 @@ export default function PersonalityPage() {
       totalHours: totalPlaytimeHours.toString(),
       mostPlayedGame: mostPlayed,
       favoriteGenre: favGenre,
-      recentActivity: "最近活跃", // 这里可以根据实际需求完善逻辑
-      completionRate: "50%",     // 这里可以根据实际需求完善逻辑
+      recentActivity: "最近活跃", 
+      completionRate: "50%",
       genreBreakdown: genreData,
     };
   }, [games, genreData]);
@@ -119,7 +118,6 @@ export default function PersonalityPage() {
                 });
               });
             }
-            // 避免请求过快
             await new Promise((resolve) => setTimeout(resolve, 80));
           } catch (err) {
             console.error(`Failed to fetch genre for ${game.name}:`, err);
@@ -130,24 +128,23 @@ export default function PersonalityPage() {
         setProgress(Math.round((completed / topGames.length) * 100));
       }
 
-      // 转换为数组并排序
       const result = Array.from(genreMap.entries())
-        。map(([name， data]) => ({ name， hours: data.hours， gameCount: data.gameCount }))
-        。sort((a， b) => b.hours - a.hours);
+        .map(([name, data]) => ({ name, hours: data.hours, gameCount: data.gameCount }))
+        .sort((a, b) => b.hours - a.hours);
 
       setGenreData(result);
       setLoadingGenres(false);
     };
 
     fetchGenres();
-  }， [games]);
+  }, [games]);
 
   if (gamesLoading || loadingGenres) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold">{t.personality。title}</h1>
-          <p className="text-muted-foreground mt-1">{t.personality。subtitle}</p>
+          <h1 className="text-2xl font-bold">{t.personality.title}</h1>
+          <p className="text-muted-foreground mt-1">{t.personality.subtitle}</p>
         </div>
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
