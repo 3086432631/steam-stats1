@@ -28,11 +28,11 @@ export function AIAnalysisGemini({ stats, onAnalysisComplete }: AIAnalysisGemini
       const data = await response.json();
       setAnalysis(data.analysis);
       setAiPrompt(data.prompt);
-      
+
       if (onAnalysisComplete) {
         onAnalysisComplete(data.analysis);
       }
-      
+
       alert("AI分析完成！");
     } catch (error) {
       console.error("分析错误:", error);
@@ -87,7 +87,7 @@ export function AIAnalysisGemini({ stats, onAnalysisComplete }: AIAnalysisGemini
 
   const handleCopyPrompt = async () => {
     if (!aiPrompt) return;
-    
+
     try {
       await navigator.clipboard.writeText(aiPrompt);
       setCopySuccess(true);
