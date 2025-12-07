@@ -1,11 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Download, Brain } from "lucide-react";
-import { toast } from "sonner";
 
 interface GameStats {
   totalGames: number;
@@ -48,6 +43,7 @@ export function AIAnalysisGemini({ stats, onAnalysisComplete }: AIAnalysisGemini
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [aiPrompt, setAiPrompt] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   const handleGeminiAnalysis = async () => {
     setIsAnalyzing(true);
@@ -72,10 +68,11 @@ export function AIAnalysisGemini({ stats, onAnalysisComplete }: AIAnalysisGemini
         onAnalysisComplete(data.analysis);
       }
       
-      toast.success("AI分析完成！");
+      // 简单的成功提示
+      alert("AI分析完成！");
     } catch (error) {
       console.error("分析错误:", error);
-      toast.error("分析失败，请重试");
+      alert("分析失败，请重试");
     } finally {
       setIsAnalyzing(false);
     }
@@ -83,7 +80,7 @@ export function AIAnalysisGemini({ stats, onAnalysisComplete }: AIAnalysisGemini
 
   const handleDownloadAnalysis = async () => {
     if (!analysis) {
-      toast.error("请先进行AI分析");
+      alert("请先进行AI分析");
       return;
     }
 
@@ -105,7 +102,6 @@ export function AIAnalysisGemini({ stats, onAnalysisComplete }: AIAnalysisGemini
         throw new Error("下载失败");
       }
 
-      // 创建下载链接
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -116,103 +112,91 @@ export function AIAnalysisGemini({ stats, onAnalysisComplete }: AIAnalysisGemini
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
-      toast.success("分析报告已下载！");
+      alert("分析报告已下载！");
     } catch (error) {
       console.error("下载错误:", error);
-      toast.error("下载失败，请重试");
+      alert("下载失败，请重试");
     } finally {
       setIsDownloading(false);
     }
   };
 
-  const handleCopyPrompt = () => {
-    if (aiPrompt) {
-      navigator.clipboard.writeText(aiPrompt);
-      toast.success("提示词已复制到剪贴板！");
+  const handleCopyPrompt = async () => {
+    if (!aiPrompt) return;
+    
+    try {
+      await navigator.clipboard.writeText(aiPrompt);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      alert("复制失败，请手动复制");
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4">
-        <Button
+        <button
           onClick={handleGeminiAnalysis}
           disabled={isAnalyzing}
-          className="flex-1"
-          size="lg"
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isAnalyzing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <span className="flex items-center justify-center">
+              <span className="animate-spin mr-2">⏳</span>
               AI分析中...
-            </>
+            </span>
           ) : (
-            <>
-              <Brain className="mr-2 h-4 w-4" />
-              使用 Gemini 分析游戏人格
-            </>
+            <span>🧠 使用 Gemini 分析游戏人格</span>
           )}
-        </Button>
+        </button>
 
         {analysis && (
-          <Button
+          <button
             onClick={handleDownloadAnalysis}
             disabled={isDownloading}
-            variant="outline"
-            size="lg"
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isDownloading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <span className="flex items-center justify-center">
+                <span className="animate-spin mr-2">⏳</span>
                 准备下载...
-              </>
+              </span>
             ) : (
-              <>
-                <Download className="mr-2 h-4 w-4" />
-                下载分析报告
-              </>
+              <span>📥 下载分析报告</span>
             )}
-          </Button>
+          </button>
         )}
       </div>
 
       {aiPrompt && (
-        <Alert>
-          <AlertDescription>
-            <div className="space-y-2">
-              <p className="font-medium">💡 提示词已生成</p>
-              <p className="text-sm text-muted-foreground">
-                您可以复制这个提示词，发送给任何AI助手进行分析
-              </p>
-              <Button
-                onClick={handleCopyPrompt}
-                variant="ghost"
-                size="sm"
-                className="mt-2"
-              >
-                复制提示词
-              </Button>
-            </div>
-          </AlertDescription>
-        </Alert>
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+          <p className="font-medium mb-2">💡 提示词已生成</p>
+          <p className="text-sm text-gray-600 mb-3">
+            您可以复制这个提示词，发送给任何AI助手进行分析
+          </p>
+          <button
+            onClick={handleCopyPrompt}
+            className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50"
+          >
+            {copySuccess ? "✅ 已复制！" : "复制提示词"}
+          </button>
+          <pre className="mt-3 p-3 bg-white rounded text-xs overflow-auto max-h-40">
+            {aiPrompt}
+          </pre>
+        </div>
       )}
 
       {analysis && (
-        <Card>
-          <CardHeader>
-            <CardTitle>🎮 AI 游戏人格分析</CardTitle>
-            <CardDescription>
-              基于 Google Gemini 2.0 Flash 模型分析结果
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="prose prose-sm max-w-none">
-              <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
-                {analysis}
-              </pre>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="border border-gray-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold mb-2">🎮 AI 游戏人格分析</h3>
+          <p className="text-sm text-gray-500 mb-4">基于 Google Gemini 2.0 Flash 模型分析结果</p>
+          <div className="prose prose-sm max-w-none">
+            <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
+              {analysis}
+            </pre>
+          </div>
+        </div>
       )}
     </div>
   );
