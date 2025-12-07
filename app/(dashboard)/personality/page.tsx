@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 import { getCachedGameDetails, setCachedGameDetails } from "@/lib/cache";
 import { useI18n } from "@/lib/i18n";
 import { AIAnalysisGemini } from "@/components/ai-analysis-gemini";
-// 确保你已经创建了 components/ai-analysis-types.ts 文件
+// 引入正确的类型定义
 import { GameStats, GenreData } from "@/components/ai-analysis-types";
 
 export default function PersonalityPage() {
@@ -18,64 +18,53 @@ export default function PersonalityPage() {
   const [loadingGenres, setLoadingGenres] = useState(true);
   const [progress, setProgress] = useState(0);
 
-  // 新增：构建 stats 数据
+  // 构建符合 GameStats 接口的数据
   const stats = useMemo((): GameStats => {
+    // 1. 处理空数据情况
     if (games.length === 0) {
       return {
         totalGames: 0,
-        playedGames: 0,
-        unplayedGames: 0,
-        totalPlaytimeHours: "0", // 注意：根据你的类型定义，这里应该是 string
-        averagePlaytimeHours: "0",
-        topGenres: [],
-        mostPlayedGame: { name: "", hours: "0" }, // 补全缺少的字段
-        favoriteGenre: { genre: "", percentage: "0%" }, // 补全缺少的字段
-        recentActivity: "无", // 补全缺少的字段
-        genreBreakdown: [], // 补全缺少的字段
-        completionRate: "0%", 
+        totalHours: "0",
+        mostPlayedGame: { name: "无", hours: "0" },
+        favoriteGenre: { genre: "无", percentage: "0%" },
+        recentActivity: "无",
+        completionRate: "0%",
+        genreBreakdown: []
       };
     }
 
+    // 2. 计算基础数据
     const playedGames = games.filter((g) => g.playtime_forever > 0);
     const totalPlaytimeMinutes = games.reduce((sum, g) => sum + g.playtime_forever, 0);
     const totalPlaytimeHours = Math.round(totalPlaytimeMinutes / 60);
 
-    // 计算热门游戏
-    const topGames = playedGames
-      .sort((a, b) => b.playtime_forever - a.playtime_forever)
-      .slice(0, 5)
-      .map((g) => ({
-        name: g.name,
-        hours: Math.round(g.playtime_forever / 60).toString(),
-      }));
+    // 3. 计算最常玩的游戏
+    const sortedByPlaytime = [...playedGames].sort((a, b) => b.playtime_forever - a.playtime_forever);
+    const mostPlayed = sortedByPlaytime[0] 
+      ? { 
+          name: sortedByPlaytime[0].name, 
+          hours: Math.round(sortedByPlaytime[0].playtime_forever / 60).toString() 
+        }
+      : { name: "无", hours: "0" };
 
-    // 转换 genreData 格式
-    const topGenres = genreData.slice(0, 5).map((g) => ({
-      name: g.name,
-      hours: g.hours,
-      count: g.gameCount,
-    }));
+    // 4. 计算最爱类型
+    const favGenre = genreData[0] 
+      ? {
+          genre: genreData[0].name,
+          percentage: totalPlaytimeHours > 0 
+            ? Math.round((genreData[0].hours / totalPlaytimeHours) * 100) + "%" 
+            : "0%"
+        }
+      : { genre: "无", percentage: "0%" };
 
-    // 准备最常玩的游戏
-    const mostPlayed = topGames[0] || { name: "无", hours: "0" };
-
-    // 准备最爱类型
-    const favGenre = genreData[0] ? {
-      genre: genreData[0].name,
-      percentage: totalPlaytimeHours > 0 ? Math.round((genreData[0].hours / totalPlaytimeHours) * 100) + "%" : "0%"
-    } : { genre: "无", percentage: "0%" };
-
+    // 5. 返回符合接口规范的对象
     return {
       totalGames: games.length,
-      playedGames: playedGames.length,
-      unplayedGames: games.length - playedGames.length,
-      totalPlaytimeHours: totalPlaytimeHours.toString(),
-      averagePlaytimeHours: (playedGames.length > 0 ? Math.round(totalPlaytimeHours / playedGames.length) : 0).toString(),
-      topGenres: [], // 为了匹配接口，这里先留空，或者你需要调整接口定义
+      totalHours: totalPlaytimeHours.toString(),
       mostPlayedGame: mostPlayed,
       favoriteGenre: favGenre,
-      recentActivity: "最近活跃", // 示例数据
-      completionRate: "50%", // 示例数据
+      recentActivity: "最近活跃", // 这里可以根据实际需求完善逻辑
+      completionRate: "50%",     // 这里可以根据实际需求完善逻辑
       genreBreakdown: genreData,
     };
   }, [games, genreData]);
@@ -130,6 +119,7 @@ export default function PersonalityPage() {
                 });
               });
             }
+            // 避免请求过快
             await new Promise((resolve) => setTimeout(resolve, 80));
           } catch (err) {
             console.error(`Failed to fetch genre for ${game.name}:`, err);
@@ -140,25 +130,24 @@ export default function PersonalityPage() {
         setProgress(Math.round((completed / topGames.length) * 100));
       }
 
-      // 【修复重点】这里全部改成了英文逗号
+      // 转换为数组并排序
       const result = Array.from(genreMap.entries())
         。map(([name， data]) => ({ name， hours: data.hours， gameCount: data.gameCount }))
-        。sort((a, b) => b.hours - a.hours);
+        。sort((a， b) => b.hours - a.hours);
 
       setGenreData(result);
       setLoadingGenres(false);
     };
 
     fetchGenres();
-  }， [games]); // 【修复重点】这里的逗号也修好了
+  }， [games]);
 
   if (gamesLoading || loadingGenres) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="mb-8">
-          {/* 【修复重点】这里的点也修好了 */}
-          <h1 className="text-2xl font-bold">{t.personality.title}</h1>
-          <p className="text-muted-foreground mt-1">{t.personality.subtitle}</p>
+          <h1 className="text-2xl font-bold">{t.personality。title}</h1>
+          <p className="text-muted-foreground mt-1">{t.personality。subtitle}</p>
         </div>
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -179,7 +168,6 @@ export default function PersonalityPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">
-        {/* 【修复重点】这里的点也修好了 */}
         <h1 className="text-2xl font-bold">{t.personality.title}</h1>
         <p className="text-muted-foreground mt-1">{t.personality.subtitle}</p>
       </div>
