@@ -7,17 +7,7 @@ import { Loader2 } from "lucide-react";
 import { getCachedGameDetails, setCachedGameDetails } from "@/lib/cache";
 import { useI18n } from "@/lib/i18n";
 import { AIAnalysisGemini } from "@/components/ai-analysis-gemini";
-
-interface GenreData {
-  name: string;
-  hours: number;
-  gameCount: number;
-}
-
-// 添加 GameStats 接口
-interface GameStats {
-  totalGames: number;
-  playedGames: number;
+import { GameStats } from "@/components/ai-analysis-types";
   unplayedGames: number;
   totalPlaytimeHours: number;
   averagePlaytimeHours: number;
