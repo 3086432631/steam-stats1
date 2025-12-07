@@ -2,15 +2,6 @@
 
 import { useState } from "react";
 import { GameStats, AIAnalysisGeminiProps } from "./ai-analysis-types";
-      hoursPlayed: string;
-    }>;
-  };
-}
-
-interface AIAnalysisGeminiProps {
-  stats: GameStats;
-  onAnalysisComplete?: (analysis: string) => void;
-}
 
 export function AIAnalysisGemini({ stats, onAnalysisComplete }: AIAnalysisGeminiProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -42,7 +33,6 @@ export function AIAnalysisGemini({ stats, onAnalysisComplete }: AIAnalysisGemini
         onAnalysisComplete(data.analysis);
       }
       
-      // 简单的成功提示
       alert("AI分析完成！");
     } catch (error) {
       console.error("分析错误:", error);
