@@ -1,33 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-interface GameStats {
-  totalGames: number;
-  playedGames: number;
-  unplayedGames: number;
-  totalPlaytimeHours: number;
-  averagePlaytimeHours: number;
-  topGenres: Array<{
-    name: string;
-    hours: number;
-    count: number;
-  }>;
-  topGames: Array<{
-    name: string;
-    hours: number;
-  }>;
-  recentlyPlayed: number;
-  oldestUnplayed: number;
-  singlePlayerRatio: number;
-  indieRatio: number;
-  completionRate: number;
-  reviews?: {
-    totalReviews: number;
-    reviews: Array<{
-      gameName: string;
-      recommended: boolean;
-      reviewText: string;
+import { GameStats, AIAnalysisGeminiProps } from "./ai-analysis-types";
       hoursPlayed: string;
     }>;
   };
