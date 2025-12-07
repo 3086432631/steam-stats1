@@ -143,7 +143,7 @@ export default function PersonalityPage() {
                 const existing = genreMap.get(genre) || { hours: 0, gameCount: 0 };
                 genreMap.set(genre, {
                   hours: existing.hours + hours,
-                  gameCount: existing.gameCount + 1，
+                  gameCount: existing.gameCount + 1,
                 });
               });
             }
@@ -166,7 +166,7 @@ export default function PersonalityPage() {
     };
 
     fetchGenres();
-  }， [games]);
+  }, [games]);
 
   if (gamesLoading || loadingGenres) {
     return (
